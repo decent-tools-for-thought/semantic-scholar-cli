@@ -7,6 +7,11 @@ name = "semantic-scholar-tool"
 version = "0.1.0"
 description = "Semantic Scholar Academic Graph CLI"
 requires-python = ">=3.11"
+readme = "README.md"
+
+[project.urls]
+Homepage = "https://api.semanticscholar.org/"
+Documentation = "https://api.semanticscholar.org/api-docs/graph"
 
 [project.scripts]
 sem = "semantic_scholar_tool.cli:main"
@@ -16,3 +21,4 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["semantic_scholar_tool*"]
