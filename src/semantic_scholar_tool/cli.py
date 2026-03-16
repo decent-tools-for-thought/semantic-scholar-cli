@@ -25,7 +25,7 @@ def _add_format_arg(parser: argparse.ArgumentParser, *choices: str) -> None:
 
 
 def _parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="sem")
+    parser = argparse.ArgumentParser(prog="semantic-scholar")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     paper = subparsers.add_parser("paper")

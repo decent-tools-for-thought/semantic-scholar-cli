@@ -14,14 +14,14 @@ pip install semantic-scholar-tool
 #### Search papers by keyword
 ```bash
 # Relevance search
-sem paper search "attention mechanisms in transformers" \
+semantic-scholar paper search "attention mechanisms in transformers" \
   --mode relevance \
   --year 2023- \
   --limit 10 \
   --format jsonl
 
 # Bulk search
-sem paper search "deep learning in bioinformatics" \
+semantic-scholar paper search "deep learning in bioinformatics" \
   --mode bulk \
   --year 2020- \
   --fields paperId,title,abstract,authors,citationCount,year \
@@ -31,7 +31,7 @@ sem paper search "deep learning in bioinformatics" \
 
 #### Fetch a paper and expand graph edges
 ```bash
-sem paper fetch --s2-id 2b6d0147698235457a4f7d6a12f8 \
+semantic-scholar paper fetch --s2-id 2b6d0147698235457a4f7d6a12f8 \
   --include-citations \
   --include-references \
   --citation-limit 20 \
@@ -40,18 +40,18 @@ sem paper fetch --s2-id 2b6d0147698235457a4f7d6a12f8 \
 
 #### Author search and profile
 ```bash
-sem author search "Yann LeCun" \
+semantic-scholar author search "Yann LeCun" \
   --min-citations 10000 \
   --limit 10
 
-sem author fetch 1741101 \
+semantic-scholar author fetch 1741101 \
   --include-papers \
   --paper-limit 50
 ```
 
 #### Traverse citations or references
 ```bash
-sem references 2b6d0147698235457a4f7d6a12f8 \
+semantic-scholar references 2b6d0147698235457a4f7d6a12f8 \
   --citations \
   --min-citation-count 100 \
   --depth 1
@@ -59,10 +59,10 @@ sem references 2b6d0147698235457a4f7d6a12f8 \
 
 #### Get recommendations
 ```bash
-sem recommendations 2b6d0147698235457a4f7d6a12f8 \
+semantic-scholar recommendations 2b6d0147698235457a4f7d6a12f8 \
   --limit 20
 
-sem recommendations \
+semantic-scholar recommendations \
   --positive-paper-id 204e3073870fae3d05bcbc2f6a8e263d9b72e776 \
   --positive-paper-id 2b6d0147698235457a4f7d6a12f8 \
   --negative-paper-id 5c5751d45e298cea054f32b392c12c61027d2fe7
@@ -70,10 +70,10 @@ sem recommendations \
 
 #### Use the datasets API
 ```bash
-sem datasets releases --format text
-sem datasets latest --format json
-sem datasets dataset papers --release latest --format json
-sem datasets diffs papers --from 2024-01-02 --to latest --format json
+semantic-scholar datasets releases --format text
+semantic-scholar datasets latest --format json
+semantic-scholar datasets dataset papers --release latest --format json
+semantic-scholar datasets diffs papers --from 2024-01-02 --to latest --format json
 ```
 
 ## API Coverage
@@ -85,46 +85,46 @@ sem datasets diffs papers --from 2024-01-02 --to latest --format json
 ## Key Commands
 
 ### Paper Discovery
-- `sem paper search <query>` - Search papers in relevance or bulk mode
-- `sem paper fetch <id>` - Fetch one paper by S2 ID or external identifier
-- `sem paper batch <id...>` - Fetch multiple papers in one request
-- `sem paper match <query>` - Match papers by query string
-- `sem paper autocomplete <query>` - Autocomplete paper titles
-- `sem paper authors <paper_id>` - List authors for a paper
-- `sem paper fields` - Show built-in field catalogs and command catalogs
+- `semantic-scholar paper search <query>` - Search papers in relevance or bulk mode
+- `semantic-scholar paper fetch <id>` - Fetch one paper by S2 ID or external identifier
+- `semantic-scholar paper batch <id...>` - Fetch multiple papers in one request
+- `semantic-scholar paper match <query>` - Match papers by query string
+- `semantic-scholar paper autocomplete <query>` - Autocomplete paper titles
+- `semantic-scholar paper authors <paper_id>` - List authors for a paper
+- `semantic-scholar paper fields` - Show built-in field catalogs and command catalogs
 
 ### Citation Graph
-- `sem references <paper_id>` - Traverse references or citations with depth control
-- `sem recommendations <paper_id>` - Get related papers for one seed paper
+- `semantic-scholar references <paper_id>` - Traverse references or citations with depth control
+- `semantic-scholar recommendations <paper_id>` - Get related papers for one seed paper
 
 ### Author Discovery
-- `sem author search <name>` - Search authors
-- `sem author fetch <author_id>` - Fetch an author profile
-- `sem author batch <id...>` - Fetch multiple authors
-- `sem author papers <author_id>` - List an author's papers
+- `semantic-scholar author search <name>` - Search authors
+- `semantic-scholar author fetch <author_id>` - Fetch an author profile
+- `semantic-scholar author batch <id...>` - Fetch multiple authors
+- `semantic-scholar author papers <author_id>` - List an author's papers
 
 ### Snippet Search
-- `sem snippets <query>` - Search snippet-level matches
+- `semantic-scholar snippets <query>` - Search snippet-level matches
 
 ### Dataset Access
-- `sem datasets releases` - List all available releases
-- `sem datasets release <release_id>` - Show one release manifest
-- `sem datasets latest` - Show the latest release manifest
-- `sem datasets dataset <dataset_name> --release <release_id|latest>` - Show dataset metadata and pre-signed file URLs
-- `sem datasets files <dataset_name> --release <release_id|latest>` - Print dataset file URLs for scripting
-- `sem datasets readme <dataset_name> --release <release_id|latest>` - Print dataset documentation/license text
-- `sem datasets diffs <dataset_name> --from <release> --to <release|latest>` - Show incremental diff manifests
+- `semantic-scholar datasets releases` - List all available releases
+- `semantic-scholar datasets release <release_id>` - Show one release manifest
+- `semantic-scholar datasets latest` - Show the latest release manifest
+- `semantic-scholar datasets dataset <dataset_name> --release <release_id|latest>` - Show dataset metadata and pre-signed file URLs
+- `semantic-scholar datasets files <dataset_name> --release <release_id|latest>` - Print dataset file URLs for scripting
+- `semantic-scholar datasets readme <dataset_name> --release <release_id|latest>` - Print dataset documentation/license text
+- `semantic-scholar datasets diffs <dataset_name> --from <release> --to <release|latest>` - Show incremental diff manifests
 
 ### Configuration
-- `sem config set api-key <key>`
-- `sem config set email <address>`
-- `sem config set default-fields <fields>`
-- `sem config set search-mode <relevance|bulk>`
-- `sem config set default-format <json|jsonl|text>`
-- `sem config set include-citation-context <true|false>`
-- `sem config show`
-- `sem config reset`
-- `sem config request-key`
+- `semantic-scholar config set api-key <key>`
+- `semantic-scholar config set email <address>`
+- `semantic-scholar config set default-fields <fields>`
+- `semantic-scholar config set search-mode <relevance|bulk>`
+- `semantic-scholar config set default-format <json|jsonl|text>`
+- `semantic-scholar config set include-citation-context <true|false>`
+- `semantic-scholar config show`
+- `semantic-scholar config reset`
+- `semantic-scholar config request-key`
 
 ## Output Formats
 
@@ -200,8 +200,8 @@ include_citation_context = false
 
 ## Datasets Notes
 
-- `sem datasets dataset ...` returns pre-signed URLs for full dataset downloads
-- `sem datasets diffs ...` returns ordered diff manifests with `updateFiles` and `deleteFiles`
+- `semantic-scholar datasets dataset ...` returns pre-signed URLs for full dataset downloads
+- `semantic-scholar datasets diffs ...` returns ordered diff manifests with `updateFiles` and `deleteFiles`
 - Datasets endpoints are metadata/manifests only; the CLI does not download or unpack the files for you
 
 ## Project Structure

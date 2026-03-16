@@ -36,11 +36,6 @@ package() {
   cd "$startdir/.makepkg-build"
   python -m installer --destdir="$pkgdir" dist/*.whl
 
-  # Avoid conflicting with GNU parallel's /usr/bin/sem on Arch systems.
-  if [[ -f "$pkgdir/usr/bin/sem" ]]; then
-    mv "$pkgdir/usr/bin/sem" "$pkgdir/usr/bin/semantic-scholar"
-  fi
-
   install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
   install -Dm644 PROJECT_OUTLINE.md "$pkgdir/usr/share/doc/$pkgname/PROJECT_OUTLINE.md"
 }

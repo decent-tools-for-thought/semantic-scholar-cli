@@ -14,7 +14,7 @@ Homepage = "https://api.semanticscholar.org/"
 Documentation = "https://api.semanticscholar.org/api-docs/graph"
 
 [project.scripts]
-sem = "semantic_scholar_tool.cli:main"
+semantic-scholar = "semantic_scholar_tool.cli:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
