@@ -1,0 +1,230 @@
+# Semantic Scholar Tool - Semantic Scholar CLI
+
+A command-line tool for the Semantic Scholar Graph API, Recommendations API, and Datasets API.
+
+## Quick Start
+
+### Installation
+```bash
+pip install semantic-scholar-tool
+```
+
+### Basic Usage
+
+#### Search papers by keyword
+```bash
+# Relevance search
+sem paper search "attention mechanisms in transformers" \
+  --mode relevance \
+  --year 2023- \
+  --limit 10 \
+  --format jsonl
+
+# Bulk search
+sem paper search "deep learning in bioinformatics" \
+  --mode bulk \
+  --year 2020- \
+  --fields paperId,title,abstract,authors,citationCount,year \
+  --limit 100 \
+  --format jsonl
+```
+
+#### Fetch a paper and expand graph edges
+```bash
+sem paper fetch --s2-id 2b6d0147698235457a4f7d6a12f8 \
+  --include-citations \
+  --include-references \
+  --citation-limit 20 \
+  --format json
+```
+
+#### Author search and profile
+```bash
+sem author search "Yann LeCun" \
+  --min-citations 10000 \
+  --limit 10
+
+sem author fetch 1741101 \
+  --include-papers \
+  --paper-limit 50
+```
+
+#### Traverse citations or references
+```bash
+sem references 2b6d0147698235457a4f7d6a12f8 \
+  --citations \
+  --min-citation-count 100 \
+  --depth 1
+```
+
+#### Get recommendations
+```bash
+sem recommendations 2b6d0147698235457a4f7d6a12f8 \
+  --limit 20
+
+sem recommendations \
+  --positive-paper-id 204e3073870fae3d05bcbc2f6a8e263d9b72e776 \
+  --positive-paper-id 2b6d0147698235457a4f7d6a12f8 \
+  --negative-paper-id 5c5751d45e298cea054f32b392c12c61027d2fe7
+```
+
+#### Use the datasets API
+```bash
+sem datasets releases --format text
+sem datasets latest --format json
+sem datasets dataset papers --release latest --format json
+sem datasets diffs papers --from 2024-01-02 --to latest --format json
+```
+
+## API Coverage
+
+1. Graph API: paper search, paper fetch, batch fetch, paper match, autocomplete, citation/reference traversal, author search/fetch, author papers, author batch, snippet search
+2. Recommendations API: recommendations from a single paper or positive/negative example sets
+3. Datasets API: release listing, release metadata, dataset file manifests, dataset README access, incremental diffs
+
+## Key Commands
+
+### Paper Discovery
+- `sem paper search <query>` - Search papers in relevance or bulk mode
+- `sem paper fetch <id>` - Fetch one paper by S2 ID or external identifier
+- `sem paper batch <id...>` - Fetch multiple papers in one request
+- `sem paper match <query>` - Match papers by query string
+- `sem paper autocomplete <query>` - Autocomplete paper titles
+- `sem paper authors <paper_id>` - List authors for a paper
+- `sem paper fields` - Show built-in field catalogs and command catalogs
+
+### Citation Graph
+- `sem references <paper_id>` - Traverse references or citations with depth control
+- `sem recommendations <paper_id>` - Get related papers for one seed paper
+
+### Author Discovery
+- `sem author search <name>` - Search authors
+- `sem author fetch <author_id>` - Fetch an author profile
+- `sem author batch <id...>` - Fetch multiple authors
+- `sem author papers <author_id>` - List an author's papers
+
+### Snippet Search
+- `sem snippets <query>` - Search snippet-level matches
+
+### Dataset Access
+- `sem datasets releases` - List all available releases
+- `sem datasets release <release_id>` - Show one release manifest
+- `sem datasets latest` - Show the latest release manifest
+- `sem datasets dataset <dataset_name> --release <release_id|latest>` - Show dataset metadata and pre-signed file URLs
+- `sem datasets files <dataset_name> --release <release_id|latest>` - Print dataset file URLs for scripting
+- `sem datasets readme <dataset_name> --release <release_id|latest>` - Print dataset documentation/license text
+- `sem datasets diffs <dataset_name> --from <release> --to <release|latest>` - Show incremental diff manifests
+
+### Configuration
+- `sem config set api-key <key>`
+- `sem config set email <address>`
+- `sem config set default-fields <fields>`
+- `sem config set search-mode <relevance|bulk>`
+- `sem config set default-format <json|jsonl|text>`
+- `sem config set include-citation-context <true|false>`
+- `sem config show`
+- `sem config reset`
+- `sem config request-key`
+
+## Output Formats
+
+### JSONL Search Result
+```jsonl
+{"backend":"semanticscholar","id":{"s2Id":"2b6d0147698235457a4f7d6a12f8","corpusId":"1234567","doi":"10.1145/1234567.1234568","pmid":null,"pmcId":null,"arxiv":null,"acl":null,"mag":null},"title":"Attention Is All You Need","authors":[{"authorId":"123","name":"Ashish Vaswani"}],"year":2017,"citationCount":45000,"referenceCount":123,"influentialCitationCount":12000,"isOpenAccess":true,"url":"https://www.semanticscholar.org/paper/2b6d0147698235457a4f7d6a12f8","provenance":{"retrievedAt":"2026-03-16T18:30:00Z","apiVersion":"graph/v1","authMode":"authenticated","fieldsRequested":["paperId","title","authors"]}}
+```
+
+### Dataset Manifest Example
+```json
+{
+  "backend": "semanticscholar",
+  "api": "datasets/v1",
+  "releaseId": "latest",
+  "name": "papers",
+  "description": "Core paper metadata",
+  "README": "Subject to terms of use ...",
+  "files": ["https://..."],
+  "provenance": {"retrievedAt": "2026-03-16T18:30:00Z"}
+}
+```
+
+## Configuration
+
+Global config path: `~/.config/semantic-scholar-tool/config.toml`
+
+```toml
+[api]
+base_url = "https://api.semanticscholar.org"
+graph_version = "v1"
+api_key = ""
+email = "user@example.com"
+
+[rate_limit]
+max_retries = 5
+initial_backoff_ms = 1000
+max_backoff_ms = 30000
+jitter_factor = 0.2
+
+[paper]
+default_search_mode = "relevance"
+default_fields = "paperId,title,authors,year,abstract,citationCount,url"
+bulk_page_size = 100
+relevance_limit = 10
+
+[author]
+default_fields = "authorId,name,affiliations,paperCount,citationCount,hIndex,url"
+
+[citation]
+default_citation_limit = 50
+
+[snippet]
+default_fields = "paper.title,paper.corpusId,paper.authors,snippet.text,snippet.section"
+
+[output]
+default_format = "jsonl"
+include_citation_context = false
+```
+
+## Authentication and Rate Limiting
+
+### Unauthenticated
+- Shared public access
+- Suitable for occasional usage and smoke testing
+
+### Authenticated
+- API key via `x-api-key`
+- More predictable for regular workflows
+
+### Backoff
+- Exponential backoff with jitter is implemented automatically
+- The API terms explicitly prohibit rate-limit circumvention
+
+## Datasets Notes
+
+- `sem datasets dataset ...` returns pre-signed URLs for full dataset downloads
+- `sem datasets diffs ...` returns ordered diff manifests with `updateFiles` and `deleteFiles`
+- Datasets endpoints are metadata/manifests only; the CLI does not download or unpack the files for you
+
+## Project Structure
+
+```text
+semantic-scholar-tool/
+├── PROJECT_OUTLINE.md
+├── README.md
+├── pyproject.toml
+├── src/
+└── tests/
+```
+
+## Documentation
+
+- `PROJECT_OUTLINE.md` - design document
+- `https://api.semanticscholar.org/api-docs/graph`
+- `https://api.semanticscholar.org/api-docs/recommendations`
+- `https://api.semanticscholar.org/api-docs/datasets`
+
+## Status
+
+- Status: Implemented
+- Version: 0.1.0
+- API Documentation: `https://api.semanticscholar.org`
+- API License: `https://www.semanticscholar.org/product/api#api-terms-and-conditions`
