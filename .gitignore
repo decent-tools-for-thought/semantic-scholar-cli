@@ -1,10 +1,6 @@
 *.pyc
 /PROJECT_OUTLINE.md
-.makepkg-build/
-pkg/
-/src/build-root/
-/src/semantic-scholar-tool-*/
-/src/*.tar.gz
-/src/*.egg-info/
-*.pkg.tar.zst
-*.tar.gz
+build/
+dist/
+*.egg-info/
+.venv/

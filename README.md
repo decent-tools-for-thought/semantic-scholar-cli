@@ -6,7 +6,15 @@ A command-line tool for the Semantic Scholar Graph API, Recommendations API, and
 
 ### Installation
 ```bash
-pip install semantic-scholar-tool
+uv tool install semantic-scholar-tool
+```
+
+Tagged GitHub releases publish Python distribution artifacts built from the tagged commit.
+
+### Development
+```bash
+uv sync
+uv run semantic-scholar --help
 ```
 
 ### Basic Usage
