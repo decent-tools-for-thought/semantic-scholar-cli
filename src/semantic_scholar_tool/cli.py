@@ -26,10 +26,10 @@ def _add_format_arg(parser: argparse.ArgumentParser, *choices: str) -> None:
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="semantic-scholar")
-    subparsers = parser.add_subparsers(dest="command", required=True)
+    subparsers = parser.add_subparsers(dest="command")
 
     paper = subparsers.add_parser("paper")
-    paper_sub = paper.add_subparsers(dest="paper_command", required=True)
+    paper_sub = paper.add_subparsers(dest="paper_command")
 
     paper_search = paper_sub.add_parser("search")
     paper_search.add_argument("query")
@@ -103,7 +103,7 @@ def _parser() -> argparse.ArgumentParser:
     _add_format_arg(paper_fields, "json", "text")
 
     author = subparsers.add_parser("author")
-    author_sub = author.add_subparsers(dest="author_command", required=True)
+    author_sub = author.add_subparsers(dest="author_command")
 
     author_search = author_sub.add_parser("search")
     author_search.add_argument("query")
@@ -181,7 +181,7 @@ def _parser() -> argparse.ArgumentParser:
     _add_format_arg(snippets, "jsonl", "json", "text")
 
     datasets = subparsers.add_parser("datasets")
-    datasets_sub = datasets.add_subparsers(dest="datasets_command", required=True)
+    datasets_sub = datasets.add_subparsers(dest="datasets_command")
 
     datasets_releases = datasets_sub.add_parser("releases")
     _add_auth_args(datasets_releases)
@@ -222,7 +222,7 @@ def _parser() -> argparse.ArgumentParser:
     _add_format_arg(datasets_diffs, "json", "text")
 
     config = subparsers.add_parser("config")
-    config_sub = config.add_subparsers(dest="config_command", required=True)
+    config_sub = config.add_subparsers(dest="config_command")
     config_sub.add_parser("show")
     config_sub.add_parser("reset")
     config_sub.add_parser("request-key")
@@ -291,6 +291,23 @@ def _paper_identifier_from_args(args) -> str:
 def main(argv: list[str] | None = None) -> int:
     parser = _parser()
     args = parser.parse_args(argv)
+    if args.command is None:
+        parser.print_help()
+        return 0
+    help_attr_by_command = {
+        "paper": "paper_command",
+        "author": "author_command",
+        "datasets": "datasets_command",
+        "config": "config_command",
+    }
+    help_attr = help_attr_by_command.get(args.command)
+    if help_attr and getattr(args, help_attr) is None:
+        next(
+            action
+            for action in parser._actions
+            if isinstance(action, argparse._SubParsersAction)
+        ).choices[args.command].print_help()
+        return 0
     config = load_config()
 
     try:
