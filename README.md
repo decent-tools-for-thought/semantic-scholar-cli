@@ -157,7 +157,7 @@ semantic-scholar datasets diffs papers --from 2024-01-02 --to latest --format js
 
 ## Configuration
 
-Global config path: `~/.config/semantic-scholar-tool/config.toml`
+Global config path: `$XDG_CONFIG_HOME/semantic-scholar-tool/config.toml` (default `~/.config/semantic-scholar-tool/config.toml`)
 
 ```toml
 [api]
