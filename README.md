@@ -7,7 +7,7 @@
 Command-line client for the Semantic Scholar Graph, Recommendations, and Datasets APIs.
 
 > [!IMPORTANT]
-> This codebase is largely AI-generated. It is useful to me, I hope it might be useful to others, and issues and contributions are welcome.
+> This codebase is entirely AI-generated. It is useful to me, I hope it might be useful to others, and issues and contributions are welcome.
 
 ## Why This Exists
 
