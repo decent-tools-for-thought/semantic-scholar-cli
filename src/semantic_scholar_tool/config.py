@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import tomllib
 
+
 def _xdg_config_home() -> Path:
     configured = os.environ.get("XDG_CONFIG_HOME")
     return Path(configured).expanduser() if configured else Path.home() / ".config"

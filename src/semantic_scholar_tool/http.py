@@ -10,7 +10,9 @@ from urllib.request import Request, urlopen
 
 
 class HttpClient:
-    def __init__(self, headers: dict[str, str] | None = None, timeout: float = 30.0) -> None:
+    def __init__(
+        self, headers: dict[str, str] | None = None, timeout: float = 30.0
+    ) -> None:
         self.headers = headers or {}
         self.timeout = timeout
 
@@ -69,7 +71,9 @@ class HttpClient:
         max_backoff_ms: int,
         jitter_factor: float,
     ) -> Any:
-        query = urlencode({k: v for k, v in (params or {}).items() if v is not None}, doseq=True)
+        query = urlencode(
+            {k: v for k, v in (params or {}).items() if v is not None}, doseq=True
+        )
         request_url = f"{url}?{query}" if query else url
         request_headers = dict(self.headers)
         request_data = None
@@ -78,14 +82,21 @@ class HttpClient:
             request_data = json.dumps(payload).encode("utf-8")
         backoff_ms = initial_backoff_ms
         for attempt in range(max_retries):
-            request = Request(request_url, data=request_data, headers=request_headers, method=method)
+            request = Request(
+                request_url, data=request_data, headers=request_headers, method=method
+            )
             try:
                 with urlopen(request, timeout=self.timeout) as response:
                     return json.loads(response.read().decode("utf-8"))
             except HTTPError as exc:
-                if exc.code not in {408, 409, 425, 429, 500, 502, 503, 504} or attempt == max_retries - 1:
+                if (
+                    exc.code not in {408, 409, 425, 429, 500, 502, 503, 504}
+                    or attempt == max_retries - 1
+                ):
                     detail = self._error_detail(exc)
-                    raise RuntimeError(f"Request failed with HTTP {exc.code}: {request_url}{detail}") from exc
+                    raise RuntimeError(
+                        f"Request failed with HTTP {exc.code}: {request_url}{detail}"
+                    ) from exc
             except URLError as exc:
                 if attempt == max_retries - 1:
                     raise RuntimeError(f"Request failed: {request_url}") from exc

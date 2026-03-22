@@ -20,8 +20,13 @@ class SemanticCoreTests(unittest.TestCase):
     def test_resolve_paper_identifier_prefixes_external_ids(self) -> None:
         self.assertEqual(resolve_paper_identifier(None, doi="doi:10.1/x"), "DOI:10.1/x")
         self.assertEqual(resolve_paper_identifier(None, pmid="123"), "PMID:123")
-        self.assertEqual(resolve_paper_identifier(None, arxiv="arXiv:1234.5678"), "ARXIV:1234.5678")
-        self.assertEqual(resolve_paper_identifier(None, url="https://example.test/paper"), "URL:https://example.test/paper")
+        self.assertEqual(
+            resolve_paper_identifier(None, arxiv="arXiv:1234.5678"), "ARXIV:1234.5678"
+        )
+        self.assertEqual(
+            resolve_paper_identifier(None, url="https://example.test/paper"),
+            "URL:https://example.test/paper",
+        )
 
     def test_normalize_paper_maps_external_ids(self) -> None:
         record = {
@@ -29,10 +34,17 @@ class SemanticCoreTests(unittest.TestCase):
             "corpusId": 7,
             "title": "Paper",
             "authors": [{"authorId": "1", "name": "Ada"}],
-            "externalIds": {"DOI": "10.1/x", "PubMed": "123", "PubMedCentral": "PMC7", "ArXiv": "1234.5678"},
+            "externalIds": {
+                "DOI": "10.1/x",
+                "PubMed": "123",
+                "PubMedCentral": "PMC7",
+                "ArXiv": "1234.5678",
+            },
             "url": "https://example.test/paper",
         }
-        normalized = normalize_paper(record, auth_mode="unauthenticated", fields_requested="paperId,title")
+        normalized = normalize_paper(
+            record, auth_mode="unauthenticated", fields_requested="paperId,title"
+        )
         self.assertEqual(normalized["id"]["doi"], "10.1/x")
         self.assertEqual(normalized["id"]["pmcId"], "PMC7")
         self.assertEqual(normalized["id"]["arxiv"], "1234.5678")
@@ -46,7 +58,9 @@ class SemanticCoreTests(unittest.TestCase):
             "hIndex": "4",
             "paperCount": "2",
         }
-        normalized = normalize_author(record, auth_mode="authenticated", fields_requested="authorId,name")
+        normalized = normalize_author(
+            record, auth_mode="authenticated", fields_requested="authorId,name"
+        )
         self.assertEqual(normalized["citationCount"], 12)
         self.assertEqual(normalized["hIndex"], 4)
         self.assertEqual(normalized["paperCount"], 2)
@@ -56,9 +70,18 @@ class SemanticCoreTests(unittest.TestCase):
             "contexts": ["cited in introduction"],
             "intents": ["background"],
             "isInfluential": True,
-            "citingPaper": {"paperId": "abc", "title": "Paper", "url": "https://example.test/paper"},
+            "citingPaper": {
+                "paperId": "abc",
+                "title": "Paper",
+                "url": "https://example.test/paper",
+            },
         }
-        normalized = normalize_edge(edge, auth_mode="unauthenticated", fields_requested="paperId,title", edge_kind="citations")
+        normalized = normalize_edge(
+            edge,
+            auth_mode="unauthenticated",
+            fields_requested="paperId,title",
+            edge_kind="citations",
+        )
         self.assertTrue(normalized["isInfluential"])
         self.assertEqual(normalized["paper"]["id"]["s2Id"], "abc")
 
@@ -71,7 +94,13 @@ class SemanticCoreTests(unittest.TestCase):
         record = {
             "release_id": "2024-01-01",
             "README": "release readme",
-            "datasets": [{"name": "papers", "description": "Core paper metadata", "README": "dataset readme"}],
+            "datasets": [
+                {
+                    "name": "papers",
+                    "description": "Core paper metadata",
+                    "README": "dataset readme",
+                }
+            ],
         }
         normalized = normalize_release_metadata(record)
         self.assertEqual(normalized["releaseId"], "2024-01-01")
@@ -104,7 +133,9 @@ class SemanticCoreTests(unittest.TestCase):
         }
         normalized = normalize_dataset_diff_list(record)
         self.assertEqual(normalized["dataset"], "papers")
-        self.assertEqual(normalized["diffs"][0]["updateFiles"][0], "https://example.test/update.gz")
+        self.assertEqual(
+            normalized["diffs"][0]["updateFiles"][0], "https://example.test/update.gz"
+        )
 
     def test_render_output_formats_dataset_releases_in_text(self) -> None:
         payload = {"items": [{"releaseId": "2024-01-01"}, {"releaseId": "2024-01-08"}]}

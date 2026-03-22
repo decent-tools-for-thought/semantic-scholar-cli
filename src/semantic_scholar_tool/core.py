@@ -62,7 +62,12 @@ DATASET_COMMAND_CATALOG = [
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    return (
+        datetime.now(timezone.utc)
+        .replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
 
 
 def _split_fields(value: str | None, default: str) -> str:
@@ -89,7 +94,9 @@ def _to_int(value: Any) -> int | None:
         return None
 
 
-def normalize_paper(record: dict[str, Any], *, auth_mode: str, fields_requested: str) -> dict[str, Any]:
+def normalize_paper(
+    record: dict[str, Any], *, auth_mode: str, fields_requested: str
+) -> dict[str, Any]:
     external_ids = record.get("externalIds") or {}
     open_access_pdf = record.get("openAccessPdf") or {}
     status = open_access_pdf.get("status")
@@ -97,7 +104,9 @@ def normalize_paper(record: dict[str, Any], *, auth_mode: str, fields_requested:
         "backend": "semanticscholar",
         "id": {
             "s2Id": record.get("paperId"),
-            "corpusId": str(record["corpusId"]) if record.get("corpusId") is not None else None,
+            "corpusId": str(record["corpusId"])
+            if record.get("corpusId") is not None
+            else None,
             "doi": external_ids.get("DOI"),
             "pmid": external_ids.get("PubMed"),
             "pmcId": external_ids.get("PubMedCentral"),
@@ -138,7 +147,9 @@ def normalize_paper(record: dict[str, Any], *, auth_mode: str, fields_requested:
             "retrievedAt": _now(),
             "apiVersion": "graph/v1",
             "authMode": auth_mode,
-            "fieldsRequested": [field for field in fields_requested.split(",") if field],
+            "fieldsRequested": [
+                field for field in fields_requested.split(",") if field
+            ],
         },
     }
     if "matchScore" in record:
@@ -146,11 +157,17 @@ def normalize_paper(record: dict[str, Any], *, auth_mode: str, fields_requested:
     return paper
 
 
-def normalize_author(record: dict[str, Any], *, auth_mode: str, fields_requested: str) -> dict[str, Any]:
+def normalize_author(
+    record: dict[str, Any], *, auth_mode: str, fields_requested: str
+) -> dict[str, Any]:
     papers = []
     for paper in record.get("papers") or []:
         if isinstance(paper, dict):
-            papers.append(normalize_paper(paper, auth_mode=auth_mode, fields_requested="paperId,title,year"))
+            papers.append(
+                normalize_paper(
+                    paper, auth_mode=auth_mode, fields_requested="paperId,title,year"
+                )
+            )
     return {
         "backend": "semanticscholar",
         "id": {"authorId": record.get("authorId")},
@@ -158,7 +175,10 @@ def normalize_author(record: dict[str, Any], *, auth_mode: str, fields_requested
         "name": record.get("name"),
         "url": record.get("url"),
         "homepage": record.get("homepage"),
-        "affiliations": [{"institution": aff, "position": None} for aff in record.get("affiliations") or []],
+        "affiliations": [
+            {"institution": aff, "position": None}
+            for aff in record.get("affiliations") or []
+        ],
         "paperCount": _to_int(record.get("paperCount")),
         "citationCount": _to_int(record.get("citationCount")),
         "hIndex": _to_int(record.get("hIndex")),
@@ -167,19 +187,25 @@ def normalize_author(record: dict[str, Any], *, auth_mode: str, fields_requested
             "retrievedAt": _now(),
             "apiVersion": "graph/v1",
             "authMode": auth_mode,
-            "fieldsRequested": [field for field in fields_requested.split(",") if field],
+            "fieldsRequested": [
+                field for field in fields_requested.split(",") if field
+            ],
         },
     }
 
 
-def normalize_edge(edge: dict[str, Any], *, auth_mode: str, fields_requested: str, edge_kind: str) -> dict[str, Any]:
+def normalize_edge(
+    edge: dict[str, Any], *, auth_mode: str, fields_requested: str, edge_kind: str
+) -> dict[str, Any]:
     key = "citingPaper" if edge_kind == "citations" else "citedPaper"
     return {
         "contexts": edge.get("contexts") or [],
         "intents": edge.get("intents") or [],
         "contextsWithIntent": edge.get("contextsWithIntent") or [],
         "isInfluential": edge.get("isInfluential"),
-        "paper": normalize_paper(edge.get(key) or {}, auth_mode=auth_mode, fields_requested=fields_requested),
+        "paper": normalize_paper(
+            edge.get(key) or {}, auth_mode=auth_mode, fields_requested=fields_requested
+        ),
     }
 
 
@@ -192,14 +218,18 @@ def normalize_autocomplete_match(match: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def normalize_snippet_hit(hit: dict[str, Any], *, auth_mode: str, fields_requested: str) -> dict[str, Any]:
+def normalize_snippet_hit(
+    hit: dict[str, Any], *, auth_mode: str, fields_requested: str
+) -> dict[str, Any]:
     paper = hit.get("paper") or {}
     return {
         "backend": "semanticscholar",
         "score": hit.get("score"),
         "snippet": hit.get("snippet") or {},
         "paper": {
-            "corpusId": str(paper["corpusId"]) if paper.get("corpusId") is not None else None,
+            "corpusId": str(paper["corpusId"])
+            if paper.get("corpusId") is not None
+            else None,
             "title": paper.get("title"),
             "authors": [
                 {"authorId": author.get("authorId"), "name": author.get("name")}
@@ -211,7 +241,9 @@ def normalize_snippet_hit(hit: dict[str, Any], *, auth_mode: str, fields_request
             "retrievedAt": _now(),
             "apiVersion": "graph/v1",
             "authMode": auth_mode,
-            "fieldsRequested": [field for field in fields_requested.split(",") if field],
+            "fieldsRequested": [
+                field for field in fields_requested.split(",") if field
+            ],
         },
     }
 
@@ -236,7 +268,9 @@ def normalize_release_metadata(record: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def normalize_dataset_metadata(record: dict[str, Any], *, release_id: str) -> dict[str, Any]:
+def normalize_dataset_metadata(
+    record: dict[str, Any], *, release_id: str
+) -> dict[str, Any]:
     return {
         "backend": "semanticscholar",
         "api": "datasets/v1",
@@ -317,7 +351,15 @@ class SemanticScholarService:
         api_key_override: str | None = None,
     ) -> None:
         self.config = config or load_config()
-        api_key = "" if no_auth else (api_key_override if api_key_override is not None else self.config["api"].get("api_key", ""))
+        api_key = (
+            ""
+            if no_auth
+            else (
+                api_key_override
+                if api_key_override is not None
+                else self.config["api"].get("api_key", "")
+            )
+        )
         headers = {"User-Agent": "semantic-scholar-tool/0.1.0"}
         if api_key:
             headers["x-api-key"] = api_key
@@ -338,7 +380,9 @@ class SemanticScholarService:
             jitter_factor=rate["jitter_factor"],
         )
 
-    def _post(self, path: str, payload: dict[str, Any], params: dict[str, Any] | None = None) -> Any:
+    def _post(
+        self, path: str, payload: dict[str, Any], params: dict[str, Any] | None = None
+    ) -> Any:
         rate = self.config["rate_limit"]
         return self.client.post_json(
             f"{self.base_url}{path}",
@@ -369,7 +413,11 @@ class SemanticScholarService:
         fields_of_study: str | None = None,
     ) -> dict[str, Any]:
         field_list = _split_fields(fields, self.config["paper"]["default_fields"])
-        endpoint = "/graph/v1/paper/search" if mode == "relevance" else "/graph/v1/paper/search/bulk"
+        endpoint = (
+            "/graph/v1/paper/search"
+            if mode == "relevance"
+            else "/graph/v1/paper/search/bulk"
+        )
         params = {
             "query": query,
             "fields": field_list,
@@ -378,7 +426,9 @@ class SemanticScholarService:
             "year": year,
             "publicationDateOrYear": publication_date_or_year,
             "publicationTypes": publication_types,
-            "openAccessPdf": str(open_access_pdf).lower() if open_access_pdf is not None else None,
+            "openAccessPdf": str(open_access_pdf).lower()
+            if open_access_pdf is not None
+            else None,
             "minCitationCount": min_citation_count,
             "venue": venue,
             "fieldsOfStudy": fields_of_study,
@@ -388,15 +438,24 @@ class SemanticScholarService:
         payload = self._request(endpoint, params)
         data = payload.get("data") or []
         return {
-            "items": [normalize_paper(item, auth_mode=self.auth_mode, fields_requested=field_list) for item in data],
+            "items": [
+                normalize_paper(
+                    item, auth_mode=self.auth_mode, fields_requested=field_list
+                )
+                for item in data
+            ],
             "meta": {
                 "offset": payload.get("offset"),
-                "next": payload.get("next") or payload.get("nextToken") or payload.get("token"),
+                "next": payload.get("next")
+                or payload.get("nextToken")
+                or payload.get("token"),
                 "mode": mode,
             },
         }
 
-    def match_paper(self, *, query: str, fields: str | None, limit: int | None, year: str | None) -> dict[str, Any]:
+    def match_paper(
+        self, *, query: str, fields: str | None, limit: int | None, year: str | None
+    ) -> dict[str, Any]:
         field_list = _split_fields(fields, self.config["paper"]["default_fields"])
         payload = self._request(
             "/graph/v1/paper/search/match",
@@ -404,14 +463,22 @@ class SemanticScholarService:
         )
         data = payload.get("data") or []
         return {
-            "items": [normalize_paper(item, auth_mode=self.auth_mode, fields_requested=field_list) for item in data],
+            "items": [
+                normalize_paper(
+                    item, auth_mode=self.auth_mode, fields_requested=field_list
+                )
+                for item in data
+            ],
             "meta": {},
         }
 
     def autocomplete_papers(self, *, query: str) -> dict[str, Any]:
         payload = self._request("/graph/v1/paper/autocomplete", {"query": query})
         matches = payload.get("matches") or []
-        return {"items": [normalize_autocomplete_match(match) for match in matches], "meta": {}}
+        return {
+            "items": [normalize_autocomplete_match(match) for match in matches],
+            "meta": {},
+        }
 
     def fetch_paper(
         self,
@@ -426,9 +493,15 @@ class SemanticScholarService:
         citation_context: bool = False,
     ) -> dict[str, Any]:
         field_list = _split_fields(fields, self.config["paper"]["default_fields"])
-        payload = self._request(f"/graph/v1/paper/{quote(paper_id, safe=':')}", {"fields": field_list})
-        result = normalize_paper(payload, auth_mode=self.auth_mode, fields_requested=field_list)
-        edge_fields = _append_fields(field_list, ["paperId", "title", "authors", "year", "url"])
+        payload = self._request(
+            f"/graph/v1/paper/{quote(paper_id, safe=':')}", {"fields": field_list}
+        )
+        result = normalize_paper(
+            payload, auth_mode=self.auth_mode, fields_requested=field_list
+        )
+        edge_fields = _append_fields(
+            field_list, ["paperId", "title", "authors", "year", "url"]
+        )
         if include_citations:
             result["citations"] = self.paper_edges(
                 paper_id=paper_id,
@@ -458,10 +531,17 @@ class SemanticScholarService:
             )
         return result
 
-    def fetch_papers_batch(self, *, paper_ids: list[str], fields: str | None) -> list[dict[str, Any]]:
+    def fetch_papers_batch(
+        self, *, paper_ids: list[str], fields: str | None
+    ) -> list[dict[str, Any]]:
         field_list = _split_fields(fields, self.config["paper"]["default_fields"])
-        payload = self._post("/graph/v1/paper/batch", {"ids": paper_ids}, params={"fields": field_list})
-        return [normalize_paper(item, auth_mode=self.auth_mode, fields_requested=field_list) for item in payload or []]
+        payload = self._post(
+            "/graph/v1/paper/batch", {"ids": paper_ids}, params={"fields": field_list}
+        )
+        return [
+            normalize_paper(item, auth_mode=self.auth_mode, fields_requested=field_list)
+            for item in payload or []
+        ]
 
     def paper_edges(
         self,
@@ -481,13 +561,26 @@ class SemanticScholarService:
         params = {"fields": edge_fields, "limit": limit, "offset": offset}
         if edge_type == "citations":
             params["publicationDateOrYear"] = publication_date_or_year
-        payload = self._request(f"/graph/v1/paper/{quote(paper_id, safe=':')}/{edge_type}", params)
-        items = [normalize_edge(item, auth_mode=self.auth_mode, fields_requested=edge_fields, edge_kind=edge_type) for item in payload.get("data") or []]
+        payload = self._request(
+            f"/graph/v1/paper/{quote(paper_id, safe=':')}/{edge_type}", params
+        )
+        items = [
+            normalize_edge(
+                item,
+                auth_mode=self.auth_mode,
+                fields_requested=edge_fields,
+                edge_kind=edge_type,
+            )
+            for item in payload.get("data") or []
+        ]
         if not citation_context:
             for item in items:
                 item.pop("contexts", None)
                 item.pop("contextsWithIntent", None)
-        return {"items": items, "meta": {"offset": payload.get("offset"), "next": payload.get("next")}}
+        return {
+            "items": items,
+            "meta": {"offset": payload.get("offset"), "next": payload.get("next")},
+        }
 
     def traverse_paper_edges(
         self,
@@ -524,12 +617,23 @@ class SemanticScholarService:
             for item in batch["items"]:
                 paper = item["paper"]
                 citation_count = paper.get("citationCount")
-                if min_citation_count is not None and citation_count is not None and citation_count < min_citation_count:
+                if (
+                    min_citation_count is not None
+                    and citation_count is not None
+                    and citation_count < min_citation_count
+                ):
                     continue
                 nodes.append(item)
                 total_fetched += 1
                 target_id = paper.get("id", {}).get("s2Id")
-                links.append({"source": current_id, "target": target_id, "depth": current_depth + 1, "type": edge_type})
+                links.append(
+                    {
+                        "source": current_id,
+                        "target": target_id,
+                        "depth": current_depth + 1,
+                        "type": edge_type,
+                    }
+                )
                 if target_id and target_id not in visited and current_depth + 1 < depth:
                     visited.add(target_id)
                     queue.append((target_id, current_depth + 1))
@@ -551,14 +655,26 @@ class SemanticScholarService:
             "meta": {"truncated": False, "depthLimit": depth_limit},
         }
 
-    def paper_authors(self, *, paper_id: str, fields: str | None, limit: int | None, offset: int | None) -> dict[str, Any]:
+    def paper_authors(
+        self,
+        *,
+        paper_id: str,
+        fields: str | None,
+        limit: int | None,
+        offset: int | None,
+    ) -> dict[str, Any]:
         field_list = _split_fields(fields, self.config["author"]["default_fields"])
         payload = self._request(
             f"/graph/v1/paper/{quote(paper_id, safe=':')}/authors",
             {"fields": field_list, "limit": limit, "offset": offset},
         )
         return {
-            "items": [normalize_author(item, auth_mode=self.auth_mode, fields_requested=field_list) for item in payload.get("data") or []],
+            "items": [
+                normalize_author(
+                    item, auth_mode=self.auth_mode, fields_requested=field_list
+                )
+                for item in payload.get("data") or []
+            ],
             "meta": {"offset": payload.get("offset"), "next": payload.get("next")},
         }
 
@@ -573,13 +689,28 @@ class SemanticScholarService:
         min_h_index: int | None = None,
     ) -> dict[str, Any]:
         field_list = _split_fields(fields, self.config["author"]["default_fields"])
-        payload = self._request("/graph/v1/author/search", {"query": query, "fields": field_list, "limit": limit, "offset": offset})
-        items = [normalize_author(item, auth_mode=self.auth_mode, fields_requested=field_list) for item in payload.get("data") or []]
+        payload = self._request(
+            "/graph/v1/author/search",
+            {"query": query, "fields": field_list, "limit": limit, "offset": offset},
+        )
+        items = [
+            normalize_author(
+                item, auth_mode=self.auth_mode, fields_requested=field_list
+            )
+            for item in payload.get("data") or []
+        ]
         if min_citations is not None:
-            items = [item for item in items if (item.get("citationCount") or 0) >= min_citations]
+            items = [
+                item
+                for item in items
+                if (item.get("citationCount") or 0) >= min_citations
+            ]
         if min_h_index is not None:
             items = [item for item in items if (item.get("hIndex") or 0) >= min_h_index]
-        return {"items": items, "meta": {"offset": payload.get("offset"), "next": payload.get("next")}}
+        return {
+            "items": items,
+            "meta": {"offset": payload.get("offset"), "next": payload.get("next")},
+        }
 
     def fetch_author(
         self,
@@ -593,8 +724,12 @@ class SemanticScholarService:
         publication_date_or_year: str | None = None,
     ) -> dict[str, Any]:
         field_list = _split_fields(fields, self.config["author"]["default_fields"])
-        payload = self._request(f"/graph/v1/author/{quote(author_id, safe='')}", {"fields": field_list})
-        result = normalize_author(payload, auth_mode=self.auth_mode, fields_requested=field_list)
+        payload = self._request(
+            f"/graph/v1/author/{quote(author_id, safe='')}", {"fields": field_list}
+        )
+        result = normalize_author(
+            payload, auth_mode=self.auth_mode, fields_requested=field_list
+        )
         if include_papers:
             result["papers"] = self.author_papers(
                 author_id=author_id,
@@ -617,17 +752,36 @@ class SemanticScholarService:
         field_list = _split_fields(fields, self.config["paper"]["default_fields"])
         payload = self._request(
             f"/graph/v1/author/{quote(author_id, safe='')}/papers",
-            {"fields": field_list, "limit": limit, "offset": offset, "publicationDateOrYear": publication_date_or_year},
+            {
+                "fields": field_list,
+                "limit": limit,
+                "offset": offset,
+                "publicationDateOrYear": publication_date_or_year,
+            },
         )
         return {
-            "items": [normalize_paper(item, auth_mode=self.auth_mode, fields_requested=field_list) for item in payload.get("data") or []],
+            "items": [
+                normalize_paper(
+                    item, auth_mode=self.auth_mode, fields_requested=field_list
+                )
+                for item in payload.get("data") or []
+            ],
             "meta": {"offset": payload.get("offset"), "next": payload.get("next")},
         }
 
-    def fetch_authors_batch(self, *, author_ids: list[str], fields: str | None) -> list[dict[str, Any]]:
+    def fetch_authors_batch(
+        self, *, author_ids: list[str], fields: str | None
+    ) -> list[dict[str, Any]]:
         field_list = _split_fields(fields, self.config["author"]["default_fields"])
-        payload = self._post("/graph/v1/author/batch", {"ids": author_ids}, params={"fields": field_list})
-        return [normalize_author(item, auth_mode=self.auth_mode, fields_requested=field_list) for item in payload or []]
+        payload = self._post(
+            "/graph/v1/author/batch", {"ids": author_ids}, params={"fields": field_list}
+        )
+        return [
+            normalize_author(
+                item, auth_mode=self.auth_mode, fields_requested=field_list
+            )
+            for item in payload or []
+        ]
 
     def recommendations_for_paper(
         self,
@@ -644,7 +798,12 @@ class SemanticScholarService:
         )
         items = payload.get("recommendedPapers") or []
         return {
-            "items": [normalize_paper(item, auth_mode=self.auth_mode, fields_requested=field_list) for item in items],
+            "items": [
+                normalize_paper(
+                    item, auth_mode=self.auth_mode, fields_requested=field_list
+                )
+                for item in items
+            ],
             "meta": {"sourcePaper": paper_id},
         }
 
@@ -659,13 +818,24 @@ class SemanticScholarService:
         field_list = _split_fields(fields, self.config["paper"]["default_fields"])
         payload = self._post(
             "/recommendations/v1/papers/",
-            {"positivePaperIds": positive_paper_ids, "negativePaperIds": negative_paper_ids},
+            {
+                "positivePaperIds": positive_paper_ids,
+                "negativePaperIds": negative_paper_ids,
+            },
             params={"fields": field_list, "limit": limit},
         )
         items = payload.get("recommendedPapers") or []
         return {
-            "items": [normalize_paper(item, auth_mode=self.auth_mode, fields_requested=field_list) for item in items],
-            "meta": {"positivePaperIds": positive_paper_ids, "negativePaperIds": negative_paper_ids},
+            "items": [
+                normalize_paper(
+                    item, auth_mode=self.auth_mode, fields_requested=field_list
+                )
+                for item in items
+            ],
+            "meta": {
+                "positivePaperIds": positive_paper_ids,
+                "negativePaperIds": negative_paper_ids,
+            },
         }
 
     def snippet_search(
@@ -701,7 +871,12 @@ class SemanticScholarService:
             },
         )
         return {
-            "items": [normalize_snippet_hit(item, auth_mode=self.auth_mode, fields_requested=field_list) for item in payload.get("data") or []],
+            "items": [
+                normalize_snippet_hit(
+                    item, auth_mode=self.auth_mode, fields_requested=field_list
+                )
+                for item in payload.get("data") or []
+            ],
             "meta": {"retrievalVersion": payload.get("retrievalVersion")},
         }
 
@@ -724,7 +899,9 @@ class SemanticScholarService:
         )
         return normalize_dataset_metadata(payload, release_id=release_id)
 
-    def dataset_diffs(self, *, start_release_id: str, end_release_id: str, dataset_name: str) -> dict[str, Any]:
+    def dataset_diffs(
+        self, *, start_release_id: str, end_release_id: str, dataset_name: str
+    ) -> dict[str, Any]:
         payload = self._request(
             f"/datasets/v1/diffs/{quote(start_release_id, safe='')}/to/{quote(end_release_id, safe='')}/{quote(dataset_name, safe='')}"
         )
@@ -737,15 +914,25 @@ def render_output(data: dict[str, Any] | list[dict[str, Any]], fmt: str) -> str:
     if fmt == "json":
         return json.dumps(data, indent=2, ensure_ascii=True)
     if fmt == "jsonl":
-        if isinstance(data, dict) and "items" in data and isinstance(data["items"], list):
+        if (
+            isinstance(data, dict)
+            and "items" in data
+            and isinstance(data["items"], list)
+        ):
             items = data["items"]
         elif isinstance(data, list):
             items = data
         else:
-            raise ValueError("jsonl output requires a list or a dict with an 'items' list")
+            raise ValueError(
+                "jsonl output requires a list or a dict with an 'items' list"
+            )
         return "\n".join(json.dumps(item, ensure_ascii=True) for item in items)
     if fmt == "text":
-        if isinstance(data, dict) and "items" in data and isinstance(data["items"], list):
+        if (
+            isinstance(data, dict)
+            and "items" in data
+            and isinstance(data["items"], list)
+        ):
             items = data["items"]
             return "\n".join(_render_text_line(item) for item in items)
         if isinstance(data, list):

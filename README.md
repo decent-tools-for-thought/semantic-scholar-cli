@@ -13,8 +13,11 @@ Tagged GitHub releases publish Python distribution artifacts built from the tagg
 
 ### Development
 ```bash
-uv sync
+uv sync --extra dev
 uv run semantic-scholar --help
+uv run ruff format --check .
+uv run ruff check .
+uv run mypy
 ```
 
 ### Basic Usage
@@ -198,9 +201,23 @@ include_citation_context = false
 - Shared public access
 - Suitable for occasional usage and smoke testing
 
+Smoke test without stored credentials:
+```bash
+semantic-scholar --help
+semantic-scholar paper fields --format text
+semantic-scholar paper search "graph neural networks" --no-auth --limit 1 --format text
+```
+
 ### Authenticated
 - API key via `x-api-key`
 - More predictable for regular workflows
+
+Store defaults for regular usage:
+```bash
+semantic-scholar config set api-key "<your-api-key>"
+semantic-scholar config set default-format json
+semantic-scholar config show
+```
 
 ### Backoff
 - Exponential backoff with jitter is implemented automatically

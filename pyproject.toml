@@ -17,9 +17,23 @@ Documentation = "https://api.semanticscholar.org/api-docs/graph"
 [project.scripts]
 semantic-scholar = "semantic_scholar_tool.cli:main"
 
+[project.optional-dependencies]
+dev = [
+    "mypy>=1.19.1",
+    "ruff>=0.15.7",
+]
+
 [tool.setuptools]
 package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["semantic_scholar_tool*"]
+
+[tool.ruff]
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+files = ["src/semantic_scholar_tool"]
+warn_unused_configs = true

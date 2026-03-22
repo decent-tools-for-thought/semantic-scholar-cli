@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from typing import Any
 
 from .config import load_config, reset_config, save_config
 from .core import (
@@ -68,7 +69,9 @@ def _parser() -> argparse.ArgumentParser:
     paper_fetch.add_argument("--include-authors", action="store_true")
     paper_fetch.add_argument("--citation-limit", type=int)
     paper_fetch.add_argument("--offset", type=int)
-    paper_fetch.add_argument("--citation-context", action=argparse.BooleanOptionalAction)
+    paper_fetch.add_argument(
+        "--citation-context", action=argparse.BooleanOptionalAction
+    )
     _add_auth_args(paper_fetch)
     _add_format_arg(paper_fetch, "json", "text")
 
@@ -147,7 +150,9 @@ def _parser() -> argparse.ArgumentParser:
     recommendations.add_argument("--negative-paper-id", action="append", default=[])
     recommendations.add_argument("--fields")
     recommendations.add_argument("--limit", type=int)
-    recommendations.add_argument("--from", dest="pool_from", choices=["recent", "all-cs"])
+    recommendations.add_argument(
+        "--from", dest="pool_from", choices=["recent", "all-cs"]
+    )
     _add_auth_args(recommendations)
     _add_format_arg(recommendations, "jsonl", "json", "text")
 
@@ -229,7 +234,14 @@ def _parser() -> argparse.ArgumentParser:
     config_set = config_sub.add_parser("set")
     config_set.add_argument(
         "field",
-        choices=["api-key", "email", "default-fields", "search-mode", "default-format", "include-citation-context"],
+        choices=[
+            "api-key",
+            "email",
+            "default-fields",
+            "search-mode",
+            "default-format",
+            "include-citation-context",
+        ],
     )
     config_set.add_argument("value")
 
@@ -319,26 +331,41 @@ def main(argv: list[str] | None = None) -> int:
                 print(json.dumps(reset_config(), indent=2, ensure_ascii=True))
                 return 0
             if args.config_command == "request-key":
-                print("Request an API key at https://www.semanticscholar.org/product/api")
+                print(
+                    "Request an API key at https://www.semanticscholar.org/product/api"
+                )
                 return 0
-            print(json.dumps(_config_set(config, args.field, args.value), indent=2, ensure_ascii=True))
+            print(
+                json.dumps(
+                    _config_set(config, args.field, args.value),
+                    indent=2,
+                    ensure_ascii=True,
+                )
+            )
             return 0
 
         if args.command == "paper" and args.paper_command == "fields":
             output_format = _output_format(args, config)
-            payload = {
+            catalog_payload = {
                 "paperFields": PAPER_FIELD_CATALOG,
                 "authorFields": AUTHOR_FIELD_CATALOG,
                 "datasetCommands": DATASET_COMMAND_CATALOG,
             }
-            print(render_output(payload, output_format))
+            print(render_output(catalog_payload, output_format))
             return 0
 
         output_format = _output_format(args, config)
         service = _service(args, config)
+        payload: dict[str, Any] | list[dict[str, Any]]
 
         if args.command == "paper" and args.paper_command == "search":
-            mode = args.mode or ("bulk" if args.bulk else "relevance" if args.relevance else config["paper"]["default_search_mode"])
+            mode = args.mode or (
+                "bulk"
+                if args.bulk
+                else "relevance"
+                if args.relevance
+                else config["paper"]["default_search_mode"]
+            )
             payload = service.search_papers(
                 query=args.query,
                 mode=mode,
@@ -362,7 +389,8 @@ def main(argv: list[str] | None = None) -> int:
                 include_citations=args.include_citations,
                 include_references=args.include_references,
                 include_authors=args.include_authors,
-                edge_limit=args.citation_limit or config["citation"]["default_citation_limit"],
+                edge_limit=args.citation_limit
+                or config["citation"]["default_citation_limit"],
                 edge_offset=args.offset,
                 citation_context=(
                     config["output"]["include_citation_context"]
@@ -371,13 +399,22 @@ def main(argv: list[str] | None = None) -> int:
                 ),
             )
         elif args.command == "paper" and args.paper_command == "batch":
-            payload = service.fetch_papers_batch(paper_ids=args.paper_ids, fields=args.fields)
+            payload = service.fetch_papers_batch(
+                paper_ids=args.paper_ids, fields=args.fields
+            )
         elif args.command == "paper" and args.paper_command == "match":
-            payload = service.match_paper(query=args.query, fields=args.fields, limit=args.limit, year=args.year)
+            payload = service.match_paper(
+                query=args.query, fields=args.fields, limit=args.limit, year=args.year
+            )
         elif args.command == "paper" and args.paper_command == "autocomplete":
             payload = service.autocomplete_papers(query=args.query)
         elif args.command == "paper" and args.paper_command == "authors":
-            payload = service.paper_authors(paper_id=args.paper_id, fields=args.fields, limit=args.limit, offset=args.offset)
+            payload = service.paper_authors(
+                paper_id=args.paper_id,
+                fields=args.fields,
+                limit=args.limit,
+                offset=args.offset,
+            )
         elif args.command == "author" and args.author_command == "search":
             payload = service.search_authors(
                 query=args.query,
@@ -398,7 +435,9 @@ def main(argv: list[str] | None = None) -> int:
                 publication_date_or_year=args.publication_date_or_year,
             )
         elif args.command == "author" and args.author_command == "batch":
-            payload = service.fetch_authors_batch(author_ids=args.author_ids, fields=args.fields)
+            payload = service.fetch_authors_batch(
+                author_ids=args.author_ids, fields=args.fields
+            )
         elif args.command == "author" and args.author_command == "papers":
             payload = service.author_papers(
                 author_id=args.author_id,
@@ -423,7 +462,9 @@ def main(argv: list[str] | None = None) -> int:
                     limit=args.limit,
                 )
             else:
-                raise ValueError("Provide a paper_id or at least one --positive-paper-id")
+                raise ValueError(
+                    "Provide a paper_id or at least one --positive-paper-id"
+                )
         elif args.command == "references":
             edge_type = "citations" if args.citations else "references"
             payload = service.traverse_paper_edges(
@@ -432,7 +473,8 @@ def main(argv: list[str] | None = None) -> int:
                 depth=args.depth,
                 depth_limit=args.depth_limit,
                 fields=args.fields,
-                per_page_limit=args.limit or config["citation"]["default_citation_limit"],
+                per_page_limit=args.limit
+                or config["citation"]["default_citation_limit"],
                 min_citation_count=args.min_citation_count,
                 citation_context=(
                     config["output"]["include_citation_context"]
@@ -456,12 +498,28 @@ def main(argv: list[str] | None = None) -> int:
             )
         elif args.command == "datasets" and args.datasets_command == "releases":
             payload = service.dataset_releases()
-        elif args.command == "datasets" and args.datasets_command in {"release", "latest"}:
-            payload = service.dataset_release(release_id=(args.release_id if args.datasets_command == "release" else "latest"))
-        elif args.command == "datasets" and args.datasets_command in {"dataset", "files", "readme"}:
-            dataset = service.dataset_metadata(release_id=args.release_id, dataset_name=args.dataset_name)
+        elif args.command == "datasets" and args.datasets_command in {
+            "release",
+            "latest",
+        }:
+            payload = service.dataset_release(
+                release_id=(
+                    args.release_id if args.datasets_command == "release" else "latest"
+                )
+            )
+        elif args.command == "datasets" and args.datasets_command in {
+            "dataset",
+            "files",
+            "readme",
+        }:
+            dataset: dict[str, Any] = service.dataset_metadata(
+                release_id=args.release_id, dataset_name=args.dataset_name
+            )
             if args.datasets_command == "files":
-                payload = {"items": [{"url": file_url} for file_url in dataset.get("files", [])]}
+                file_urls = dataset.get("files")
+                if not isinstance(file_urls, list):
+                    file_urls = []
+                payload = {"items": [{"url": str(file_url)} for file_url in file_urls]}
             elif args.datasets_command == "readme":
                 payload = {
                     "backend": "semanticscholar",
@@ -482,7 +540,9 @@ def main(argv: list[str] | None = None) -> int:
             raise ValueError("Unsupported command")
 
         if output_format == "jsonl":
-            printable = payload if isinstance(payload, list) else payload.get("items", payload)
+            printable: dict[str, Any] | list[dict[str, Any]] = (
+                payload if isinstance(payload, list) else payload.get("items", payload)
+            )
         else:
             printable = payload
         print(render_output(printable, output_format))
