@@ -14,11 +14,11 @@ Command-line client for Semantic Scholar paper, author, recommendation, snippet,
 > This codebase is entirely AI-generated. It is useful to me, I hope it might be useful to others, and issues and contributions are welcome.
 
 ## Map
+$$\color{#EAB308}Tool \space \color{#CA8A04}Map$$
 - [Install](#install)
 - [Functionality](#functionality)
 - [Authentication](#authentication)
 - [Quick Start](#quick-start)
-- [Development](#development)
 - [Credits](#credits)
 
 ## Install
@@ -28,14 +28,8 @@ uv tool install .
 semantic-scholar --help
 ```
 
-For local development:
-
-```bash
-uv sync --extra dev
-uv run semantic-scholar --help
-```
-
 ## Functionality
+$$\color{#EAB308}Core \space \color{#CA8A04}Features$$
 
 ### Paper Workflows
 - `semantic-scholar paper search <query>`: search papers with relevance or bulk mode, field selection, year filters, publication-date filters, publication-type filters, venue filters, field-of-study filters, citation-count filters, token pagination, sorting, and `jsonl`/`json`/`text` output.
@@ -75,6 +69,7 @@ uv run semantic-scholar --help
 - `semantic-scholar config set api-key`, `email`, `default-fields`, `search-mode`, `default-format`, and `include-citation-context`: tune saved defaults.
 
 ## Authentication
+$$\color{#EAB308}Access \space \color{#CA8A04}Control$$
 
 Smoke usage works without stored credentials:
 
@@ -90,6 +85,7 @@ semantic-scholar config show
 ```
 
 ## Quick Start
+$$\color{#EAB308}Quick \space \color{#CA8A04}Start$$
 
 ```bash
 semantic-scholar paper search "attention mechanisms in transformers" \
@@ -104,15 +100,8 @@ semantic-scholar datasets latest --format json
 semantic-scholar datasets dataset papers --release latest --format json
 ```
 
-## Development
-
-```bash
-uv run ruff format --check .
-uv run ruff check .
-uv run mypy
-```
-
 ## Credits
+$$\color{#EAB308}Project \space \color{#CA8A04}Credits$$
 
 This client is built for the Semantic Scholar APIs and is not affiliated with Semantic Scholar or the Allen Institute for AI.
 
