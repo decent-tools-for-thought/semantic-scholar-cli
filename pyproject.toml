@@ -7,7 +7,7 @@ name = "semantic-scholar-tool"
 version = "0.1.0"
 description = "Semantic Scholar Academic Graph CLI"
 license = "0BSD"
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 readme = "README.md"
 
 [project.urls]
@@ -19,7 +19,9 @@ semantic-scholar = "semantic_scholar_tool.cli:main"
 
 [project.optional-dependencies]
 dev = [
+    "build>=1.2.2",
     "mypy>=1.19.1",
+    "pytest>=8.4.2",
     "ruff>=0.15.7",
 ]
 
@@ -34,6 +36,6 @@ include = ["semantic_scholar_tool*"]
 target-version = "py311"
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.13"
 files = ["src/semantic_scholar_tool"]
 warn_unused_configs = true

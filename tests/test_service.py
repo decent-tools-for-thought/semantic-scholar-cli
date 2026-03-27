@@ -108,10 +108,13 @@ class ServiceTests(unittest.TestCase):
         self.assertEqual(
             client.calls[0][1], "https://api.semanticscholar.org/graph/v1/paper/search"
         )
-        self.assertEqual(client.calls[0][2]["fields"], "paperId,title,url")
-        self.assertEqual(client.calls[0][2]["offset"], 10)
-        self.assertIsNone(client.calls[0][2]["token"])
-        self.assertIsNone(client.calls[0][2]["sort"])
+        params = client.calls[0][2]
+        self.assertIsNotNone(params)
+        assert params is not None
+        self.assertEqual(params["fields"], "paperId,title,url")
+        self.assertEqual(params["offset"], 10)
+        self.assertIsNone(params["token"])
+        self.assertIsNone(params["sort"])
 
     def test_search_papers_bulk_mode_uses_bulk_endpoint_and_token(self) -> None:
         client = RecordingClient()
@@ -132,10 +135,13 @@ class ServiceTests(unittest.TestCase):
             client.calls[0][1],
             "https://api.semanticscholar.org/graph/v1/paper/search/bulk",
         )
-        self.assertEqual(client.calls[0][2]["fields"], "paperId,title")
-        self.assertIsNone(client.calls[0][2]["offset"])
-        self.assertEqual(client.calls[0][2]["token"], "next-page")
-        self.assertEqual(client.calls[0][2]["sort"], "publicationDate:desc")
+        params = client.calls[0][2]
+        self.assertIsNotNone(params)
+        assert params is not None
+        self.assertEqual(params["fields"], "paperId,title")
+        self.assertIsNone(params["offset"])
+        self.assertEqual(params["token"], "next-page")
+        self.assertEqual(params["sort"], "publicationDate:desc")
 
     def test_fetch_author_uses_default_author_fields(self) -> None:
         client = RecordingClient()
@@ -146,7 +152,10 @@ class ServiceTests(unittest.TestCase):
         self.assertEqual(
             client.calls[0][1], "https://api.semanticscholar.org/graph/v1/author/123"
         )
-        self.assertEqual(client.calls[0][2]["fields"], "authorId,name,url")
+        params = client.calls[0][2]
+        self.assertIsNotNone(params)
+        assert params is not None
+        self.assertEqual(params["fields"], "authorId,name,url")
 
 
 if __name__ == "__main__":

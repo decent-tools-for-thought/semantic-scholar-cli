@@ -2,11 +2,39 @@ from __future__ import annotations
 
 from collections import deque
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Protocol
 from urllib.parse import quote
 
 from .config import load_config
 from .http import HttpClient
+
+
+class SemanticScholarHttpClient(Protocol):
+    headers: dict[str, str]
+
+    def get_json(
+        self,
+        url: str,
+        params: dict[str, Any] | None,
+        *,
+        max_retries: int,
+        initial_backoff_ms: int,
+        max_backoff_ms: int,
+        jitter_factor: float,
+    ) -> Any: ...
+
+    def post_json(
+        self,
+        url: str,
+        payload: dict[str, Any],
+        *,
+        params: dict[str, Any] | None,
+        max_retries: int,
+        initial_backoff_ms: int,
+        max_backoff_ms: int,
+        jitter_factor: float,
+    ) -> Any: ...
+
 
 PAPER_FIELD_CATALOG = [
     "paperId",
@@ -346,7 +374,7 @@ class SemanticScholarService:
     def __init__(
         self,
         config: dict | None = None,
-        client: HttpClient | None = None,
+        client: SemanticScholarHttpClient | None = None,
         no_auth: bool = False,
         api_key_override: str | None = None,
     ) -> None:
