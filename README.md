@@ -16,7 +16,7 @@ Command-line client for Semantic Scholar paper, author, recommendation, snippet,
 ## Map
 - [Install](#install)
 - [Functionality](#functionality)
-- [Authentication](#authentication)
+- [Configuration](#configuration)
 - [Quick Start](#quick-start)
 - [Credits](#credits)
 
@@ -66,7 +66,7 @@ $$\color{#EAB308}Saved \space \color{#CA8A04}Defaults$$
 - `semantic-scholar config request-key`: print API-key request guidance.
 - `semantic-scholar config set api-key`, `email`, `default-fields`, `search-mode`, `default-format`, and `include-citation-context`: tune saved defaults.
 
-## Authentication
+## Configuration
 $$\color{#EAB308}Access \space \color{#CA8A04}Setup$$
 
 Smoke usage works without stored credentials:
