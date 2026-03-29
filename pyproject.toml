@@ -17,7 +17,7 @@ Documentation = "https://api.semanticscholar.org/api-docs/graph"
 [project.scripts]
 semantic-scholar = "semantic_scholar_tool.cli:main"
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "build>=1.2.2",
     "mypy>=1.19.1",
