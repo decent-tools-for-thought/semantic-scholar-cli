@@ -388,7 +388,7 @@ class SemanticScholarService:
                 else self.config["api"].get("api_key", "")
             )
         )
-        headers = {"User-Agent": "semantic-scholar-tool/0.1.0"}
+        headers = {"User-Agent": "semantic-scholar-cli/0.1.0"}
         if api_key:
             headers["x-api-key"] = api_key
             self.auth_mode = "authenticated"

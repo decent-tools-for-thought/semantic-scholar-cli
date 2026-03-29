@@ -11,7 +11,7 @@ def _xdg_config_home() -> Path:
     return Path(configured).expanduser() if configured else Path.home() / ".config"
 
 
-CONFIG_DIR = _xdg_config_home() / "semantic-scholar-tool"
+CONFIG_DIR = _xdg_config_home() / "semantic-scholar-cli"
 CONFIG_PATH = CONFIG_DIR / "config.toml"
 
 DEFAULT_CONFIG = {

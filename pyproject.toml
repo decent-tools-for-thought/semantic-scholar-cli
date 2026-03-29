@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "semantic-scholar-tool"
+name = "semantic-scholar-cli"
 version = "0.1.0"
 description = "Semantic Scholar Academic Graph CLI"
 license = "0BSD"
